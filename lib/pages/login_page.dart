@@ -1,92 +1,136 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import '../provider/authprovider.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  bool isLogin = true; // Toggles between login and create account
-
-  void _toggleFormType() {
-    setState(() {
-      isLogin = !isLogin;
-    });
-  }
-
-  Future<void> _submit() async {
-    try {
-      if (isLogin) {
-        // Login functionality
-        await _auth.signInWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
-        Navigator.pushReplacementNamed(context, '/dashboard');
-      } else {
-        // Create account functionality
-        await _auth.createUserWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
-        setState(() => isLogin = true); // Switch back to login view
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error: ${e.toString()}'),
-        backgroundColor: Colors.red,
-      ));
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    final nameController = TextEditingController(); // Controller for name
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(isLogin ? 'Login' : 'Create Account'),
+        title: const Text('StepPulse'),
+        centerTitle: true,
+        backgroundColor: theme.primaryColor,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // App Name
+              const Text(
+                'StepPulse',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurple,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(),
+              const SizedBox(height: 8),
+              // Welcome Message
+              Text(
+                authProvider.isLogin
+                    ? 'Welcome Back! Please log in to continue.'
+                    : 'Join StepPulse and track your health effortlessly!',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16),
               ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _submit,
-              child: Text(isLogin ? 'Login' : 'Create Account'),
-            ),
-            TextButton(
-              onPressed: _toggleFormType,
-              child: Text(
-                isLogin
-                    ? 'Don’t have an account? Create one'
-                    : 'Already have an account? Login',
+              const SizedBox(height: 24),
+              if (authProvider.errorMessage != null)
+                Text(
+                  authProvider.errorMessage!,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              if (authProvider.errorMessage != null) const SizedBox(height: 8),
+              if (!authProvider.isLogin)
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Name',
+                    labelStyle: TextStyle(color: theme.colorScheme.primary),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: theme.colorScheme.primary),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: theme.colorScheme.primary),
+                    ),
+                  ),
+                ),
+              if (!authProvider.isLogin) const SizedBox(height: 16),
+              TextField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  labelStyle: TextStyle(color: theme.colorScheme.primary),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: theme.colorScheme.primary),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: theme.colorScheme.primary),
+                  ),
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  labelStyle: TextStyle(color: theme.colorScheme.primary),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: theme.colorScheme.primary),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: theme.colorScheme.primary),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  if (!authProvider.isLogin && nameController.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please enter your name')),
+                    );
+                    return;
+                  }
+
+                  await authProvider.submit(
+                    emailController.text.trim(),
+                    passwordController.text.trim(),
+                  );
+
+                  if (authProvider.errorMessage == null) {
+                    Navigator.pushReplacementNamed(context, '/dashboard');
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
+                ),
+                child: Text(authProvider.isLogin ? 'Login' : 'Create Account'),
+              ),
+              TextButton(
+                onPressed: authProvider.toggleFormType,
+                child: Text(
+                  authProvider.isLogin
+                      ? 'Don’t have an account? Create one'
+                      : 'Already have an account? Login',
+                  style: TextStyle(color: theme.colorScheme.primary),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
