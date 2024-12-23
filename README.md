@@ -59,7 +59,7 @@ flutter pub get
     - `android/app/google-services.json`
     - `ios/Runner/GoogleService-Info.plist`
       
-(if want to run in android no need to do iOS Setup things)
+(if want to run in android no need to do iOS Setup things only do it for Android)
 
 ### 4. Run the App
 ```bash
