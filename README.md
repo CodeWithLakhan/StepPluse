@@ -86,7 +86,7 @@ lib/
 ---
 
 ## Demo Video
-Watch the demo video of the StepPulse app in action: **[Demo Video - Google Drive](#)**
+Watch the demo video of the StepPulse app in action: **[Demo Video - Google Drive](https://drive.google.com/drive/folders/1ovRJH5Uw7XfVZ-b0RINrMoDnnqAmr-Ct?usp=sharing)**
 
 ---
 
