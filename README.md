@@ -52,12 +52,13 @@ cd steppulse
 flutter pub get
 ```
 
-### 3. Firebase Setup for Android
+### 3. Firebase Setup 
 1. Create a Firebase project and enable Authentication and Cloud Firestore.
 2. Download the `google-services.json` (Android) and `GoogleService-Info.plist` (iOS) files.
 3. Place these files in the respective directories:
     - `android/app/google-services.json`
     - `ios/Runner/GoogleService-Info.plist`
+(if want to run in android no need to do iOS Setup things)
 
 ### 4. Run the App
 ```bash
