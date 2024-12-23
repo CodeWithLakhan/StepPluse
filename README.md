@@ -58,6 +58,7 @@ flutter pub get
 3. Place these files in the respective directories:
     - `android/app/google-services.json`
     - `ios/Runner/GoogleService-Info.plist`
+      
 (if want to run in android no need to do iOS Setup things)
 
 ### 4. Run the App
