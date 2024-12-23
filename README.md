@@ -43,7 +43,7 @@ StepPulse is a Flutter-based smartwatch companion app designed to monitor and tr
 
 ### 1. Clone the Repository
 ```bash
-git clone [<repository-url>](https://github.com/CodeWithLakhan/StepPluse)
+git clone https://github.com/CodeWithLakhan/StepPluse
 cd steppulse
 ```
 
